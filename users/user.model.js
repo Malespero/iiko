@@ -10,7 +10,6 @@ const schema = new Schema({
     phone: { type: String, required: true, default: ""  },
     iikoId: { type: String, required: false }, //TODO
     hash: { type: String, required: false },
-    isAdmin: {type: Boolean, default: false},
     createdDate: { type: Date, default: Date.now }
 });
 

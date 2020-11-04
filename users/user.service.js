@@ -15,15 +15,12 @@ async function create(userParam) {
     if ( userParam.phone.length != 10 || !userParam.phone) {
         throw 'user phone must be 10-digit(no +7 or 8)';
     }
-
     if ( userParam.name === "" || !userParam.name ) {
         throw 'field "name" must be filled';
     }
-
     if ( userParam.surname === "" || !userParam.surname ) {
         throw 'field "surname" must be filled';
     }
-
     if ( userParam.city === "" || !userParam.city ) {
         throw 'field "city" must be filled';
     }
@@ -33,24 +30,15 @@ async function create(userParam) {
 
     const user = new User(userParam);
 
-    /* // hash password
-    if (userParam.password) {
-        user.hash = bcrypt.hashSync(userParam.password, 10);
-    } */
-
     // save user
     await user.save();
-    console.log(user.id)
-    return{
-        ...user.toJson
-    }
-
-
-    /* const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
+    console.log(user);
+    const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
+    console.log(token);
     return {
         ...user.toJSON(),
         token
-    }; */
+    };
 }
 
 async function update(id, userParam, user) {
@@ -58,12 +46,7 @@ async function update(id, userParam, user) {
         const user = await User.findById(id);
 
         // validate
-        if (!user) throw 'User not found';
-
-        // hash password if it was entered
-        if (userParam.password) {
-            userParam.hash = bcrypt.hashSync(userParam.password, 10);
-        }
+        if (!user) throw 'User not found'
 
         // copy userParam properties to user
         Object.assign(user, userParam);
