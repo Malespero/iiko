@@ -5,63 +5,52 @@ const db = require('_helpers/db');
 const User = db.User;
 
 module.exports = {
-    authenticate,
-    getAll,
-    getById,
     create,
     update,
-    delete: _delete
+
 };
-
-async function authenticate({ username, password }) {
-    const user = await User.findOne({ username });
-    if (user && bcrypt.compareSync(password, user.hash)) {
-        const token = jwt.sign({ sub: user.id, isAdmin: user.isAdmin }, config.secret, { expiresIn: '7d' });
-        return {
-            ...user.toJSON(),
-            token
-        };
-    }
-}
-
-async function getAll(user) {
-    console.log(user)
-    if(user.isAdmin === true)
-    {
-        return await User.find();
-    }else
-    {
-        throw 'Only admin users can see all users';
-    }
-}
-
-async function getById(id, user) {
-    console.log(id);
-    console.log(user);
-    if(user.isAdmin === true || user.sub === id) {
-        return await User.findById(id);
-    }
-    else{
-        throw 'You are not allowed to do that';
-    }
-    
-}
 
 async function create(userParam) {
     // validate
-    if (await User.findOne({ username: userParam.username })) {
-        throw 'Username "' + userParam.username + '" is already taken';
+    if ( userParam.phone.length != 10 || !userParam.phone) {
+        throw 'user phone must be 10-digit(no +7 or 8)';
+    }
+
+    if ( userParam.name === "" || !userParam.name ) {
+        throw 'field "name" must be filled';
+    }
+
+    if ( userParam.surname === "" || !userParam.surname ) {
+        throw 'field "surname" must be filled';
+    }
+
+    if ( userParam.city === "" || !userParam.city ) {
+        throw 'field "city" must be filled';
+    }
+    if ( userParam.birthDay >= Date.now ) {
+        throw 'invalid birthday';
     }
 
     const user = new User(userParam);
 
-    // hash password
+    /* // hash password
     if (userParam.password) {
         user.hash = bcrypt.hashSync(userParam.password, 10);
-    }
+    } */
 
     // save user
     await user.save();
+    console.log(user.id)
+    return{
+        ...user.toJson
+    }
+
+
+    /* const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
+    return {
+        ...user.toJSON(),
+        token
+    }; */
 }
 
 async function update(id, userParam, user) {
@@ -70,9 +59,6 @@ async function update(id, userParam, user) {
 
         // validate
         if (!user) throw 'User not found';
-        if (user.username !== userParam.username && await User.findOne({ username: userParam.username })) {
-            throw 'Username "' + userParam.username + '" is already taken';
-        }
 
         // hash password if it was entered
         if (userParam.password) {
@@ -91,17 +77,5 @@ async function update(id, userParam, user) {
     }
 
     
-    
-}
-
-async function _delete(id, user) {
-    if(user.isAdmin === true || user.sub === id) {
-        await User.findByIdAndRemove(id);
-        throw 'User ' + id + ' has been deleted'
-    }
-    else{
-        throw 'You are not allowed to do that';
-    }
-
     
 }

@@ -2,9 +2,14 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-    username: { type: String, unique: true, required: true },
-    birthDay: { type: Date, default: Date.now},
-    hash: { type: String, required: true },
+    name: { type: String, required: true, default: "" },
+    surname: { type: String, required: true, default: ""  },
+    city: { type: String, required: true, default: ""  },
+    birthDay: { type: Date },
+    gender: {type: Boolean, default: false}, //false - male, true - female
+    phone: { type: String, required: true, default: ""  },
+    iikoId: { type: String, required: false }, //TODO
+    hash: { type: String, required: false },
     isAdmin: {type: Boolean, default: false},
     createdDate: { type: Date, default: Date.now }
 });
