@@ -29,9 +29,6 @@ async function create(userParam) {
     }
 
     const user = new User(userParam);
-
-
-    const user = new User(userParam);
     await user.save();
     const _phone = userParam.phone;
     await authenticate(_phone);
