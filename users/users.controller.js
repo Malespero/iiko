@@ -4,7 +4,7 @@ const userService = require('./user.service');
 
 // routes
 router.post('/register', register);         //all
-router.put('/:id', update);                 //self
+router.post('/authenticate', authenticate); //all
 
 module.exports = router;
 
@@ -15,8 +15,8 @@ function register(req, res, next) {
         .catch(err => next(err));
 }
 
-function update(req, res, next) {
-    userService.update(req.params.id, req.body, req.user)
-        .then(() => res.json({}))
+function authenticate(req, res, next) {
+    userService.authenticate(req.body)
+        .then(user => user ? res.json(user) : res.status(400).json({ message: 'Username or password is incorrect' }))
         .catch(err => next(err));
 }

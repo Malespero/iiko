@@ -6,7 +6,7 @@ const User = db.User;
 
 module.exports = {
     create,
-    update,
+    authenticate,
 
 };
 
@@ -30,34 +30,21 @@ async function create(userParam) {
 
     const user = new User(userParam);
 
-    // save user
+
+    const user = new User(userParam);
     await user.save();
-    console.log(user);
-    const token = jwt.sign({ sub: user.id }, config.secret, { expiresIn: '7d' });
-    console.log(token);
+    const _phone = userParam.phone;
+    await authenticate(_phone);
+}
+
+async function authenticate({ phone }) {
+    const user = await User.findOne({ phone });
+    
+    const token = jwt.sign({ sub: user.id});
     return {
         ...user.toJSON(),
         token
     };
-}
-
-async function update(id, userParam, user) {
-    if(user.sub === id){
-        const user = await User.findById(id);
-
-        // validate
-        if (!user) throw 'User not found'
-
-        // copy userParam properties to user
-        Object.assign(user, userParam);
-
-        await user.save();
-        throw 'You are updated';
-    }
-    else
-    {
-        throw 'You can only change yourself';
-    }
 
     
     
